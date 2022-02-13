@@ -1,0 +1,44 @@
+.goal-progressbar-label{
+    display: flex;
+    width: 300px;
+    justify-content: space-between;
+}
+
+.bar-percentage{
+    width: 120px;
+    display: flex;
+    font-size: small;
+}
+
+
+.bar-title{
+
+    width: 100px;
+    height: fit-content;
+    display: flex;
+    justify-content: flex-end;
+    font-size: small;
+    color: grey;
+}
+
+.label-container{
+    height: 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    color: rgb(165, 164, 164);
+}
+
+.display-label-column{
+    height: 100px;
+    margin: auto;
+   
+}
+
+p.goal-tracker-title{
+
+    margin-left: 35px;
+    margin-top: 25px;
+    font-size: 25px;
+}

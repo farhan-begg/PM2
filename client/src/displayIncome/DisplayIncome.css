@@ -1,0 +1,36 @@
+.display-income-data{
+    width: fit-content;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 80px;
+    text-align: center;
+
+}
+
+p.display-income-data-title{
+    font-size: 18px;
+    color: #626262;
+    
+}
+
+h3.display-income-data-number{
+    color: #279754
+}
+
+h3.display-income-data-number-credit{
+    color: #C50B16;
+}
+
+p.start-end{
+    margin-right:25px;
+ ;
+}
+p.start{
+    margin-left:25px;
+
+}
+
+h3.goal-grey{
+    color: #626262;
+}
