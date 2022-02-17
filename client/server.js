@@ -85,6 +85,7 @@ app.post('/api/info', function (request, response, next) {
   });
 });
 
+
 app.get('/', (req, res) => res.send('Hello World'))
 
 // Create a link token with configs which we can then use to initialize Plaid Link client-side.
