@@ -7,6 +7,7 @@ const util = require('util');
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment');
+const cors = require('cors');
 
 const APP_PORT = process.env.APP_PORT || 8000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
@@ -49,7 +50,7 @@ let ITEM_ID = null;
 // persistent data store
 let PAYMENT_ID = null;
 // The transfer_id is only relevant for Transfer ACH product.
-// We store the transfer_id in memomory - in produciton, store it in a secure
+// We store the transfer_id in memory - in production, store it in a secure
 // persistent data store
 let TRANSFER_ID = null;
 
@@ -76,6 +77,7 @@ app.use(
   }),
 );
 app.use(bodyParser.json());
+app.use(cors())
 
 app.post('/api/info', function (request, response, next) {
   response.json({
@@ -85,11 +87,9 @@ app.post('/api/info', function (request, response, next) {
   });
 });
 
-app.get('/', (req, res) => res.send('Hello World'))
-
 // Create a link token with configs which we can then use to initialize Plaid Link client-side.
 // See https://plaid.com/docs/#create-link-token
-app.post('/api/create_link_token', function (request, response, next) {
+app.post('/create_link_token', function (request, response, next) {
   Promise.resolve()
     .then(async function () {
       const configs = {
@@ -102,6 +102,8 @@ app.post('/api/create_link_token', function (request, response, next) {
         country_codes: PLAID_COUNTRY_CODES,
         language: 'en',
       };
+
+      console.log(configs)
 
       if (PLAID_REDIRECT_URI !== '') {
         configs.redirect_uri = PLAID_REDIRECT_URI;
@@ -177,8 +179,11 @@ app.post(
 // Exchange token flow - exchange a Link public_token for
 // an API access_token
 // https://plaid.com/docs/#exchange-token-flow
+
+
 app.post('/api/set_access_token', function (request, response, next) {
-  PUBLIC_TOKEN = request.body.public_token;
+  PUBLIC_TOKEN = request.body.publicToken;
+  console.log(PUBLIC_TOKEN)
   Promise.resolve()
     .then(async function () {
       const tokenResponse = await client.itemPublicTokenExchange({
@@ -198,6 +203,217 @@ app.post('/api/set_access_token', function (request, response, next) {
     })
     .catch(next);
 });
+
+
+// app.post('/exchange_public_token', async (request, res, next) => {
+//   console.log(res)
+//   console.log(request.body)
+//   PUBLIC_TOKEN = request.body.publicToken;
+
+//   try {
+//     //public token cant be found
+//     const response = await client
+//       .itemPublicTokenExchange({
+//         public_token: PUBLIC_TOKEN
+//       })
+//       .catch((err) => {
+//         console.log(err)
+//       });
+
+//     console.log(response)
+//     // const accessToken = response.data.access_token;
+//     // const itemId = response.data.item_id;
+//     // ACCESS_TOKEN = response.dataaccess_token;
+//     // ITEM_ID = response.data.item_id;
+//     // res.json({
+//     //   access_token: accessToken,
+//     //   item_id: itemId
+//     // });
+//     console.log("access token below");
+//     // console.log(accessToken);
+//   }
+//   catch (e) {
+//     console.log(e)
+//   }
+
+// });
+
+
+// this one works
+app.post('/exchange_public_token', async (request, res, next) => {
+  PUBLIC_TOKEN = request.body.public_token
+  try {
+    //public token cant be found
+
+    const response = await client
+      .itemPublicTokenExchange({
+        public_token: PUBLIC_TOKEN,
+      })
+      .catch((err) => {
+        console.log(err)
+      });
+    const accessToken = response.data.access_token;
+    const itemId = response.data.item_id;
+
+    const balanceResponse = await client.accountsBalanceGet({
+      access_token: accessToken,
+    });
+    console.log('---------')
+    console.log('balamcey response: ')
+    console.log(util.inspect(balanceResponse, false, null))
+
+
+    const authResponse = await client.authGet({
+      access_token: accessToken,
+    });
+    console.log('---------')
+    console.log('balamcey response: ')
+    console.log(util.inspect(authResponse, false, null))
+
+
+    const startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+    const endDate = moment().format('YYYY-MM-DD');
+    const configs = {
+      access_token: accessToken,
+      start_date: startDate,
+      end_date: endDate,
+      options: {
+        count: 250,
+        offset: 0,
+      },
+    };
+    const transactionsResponse = await client.transactionsGet(configs);
+    prettyPrintResponse(transactionsResponse);
+    // res.json(transactionsResponse.data);
+
+
+    res.json({
+      access_token: accessToken,
+      item_id: itemId,
+      transactionsResponse: transactionsResponse.data,
+      authResponse: authResponse.data,
+      balanceResponse: balanceResponse.data
+
+
+    });
+
+    console.log(util.inspect(transactionsResponse, false, null))
+    console.log("access token below");
+    console.log(accessToken);
+  }
+  catch (e) {
+    console.log(e)
+  }
+
+
+});
+
+
+// app.post('api/exchange_public_token', async (request, res) => {
+//   PUBLIC_TOKEN = request.body.public_token
+//   try {
+//     const response = await client
+//       .itemPublicTokenExchange({
+//         public_token: PUBLIC_TOKEN,
+//       })
+//       .catch((err) => {
+//         console.log(err)
+//       });
+//     const authResponse = await client.authGet({
+//       access_token: accessToken,
+//     })
+//     const accessToken = response.data.access_token;
+//     const itemId = response.data.item_id;
+//     res.json({
+//       access_token: accessToken,
+//       item_id: itemId,
+//     });
+//     console.log("access token below");
+//     console.log(accessToken);
+
+//   } catch {
+//     console.log('error')
+//   }
+// })
+//public token cant be found
+
+// const authResponse = authResponses.data;
+// ACCESS_TOKEN = response.access_token;
+// ITEM_ID = response.item_id;
+// prettyPrintResponse(authResponse);
+// res.json(authResponse.data)
+
+
+// console.log('---------')
+// console.log('Auth response: ')
+// console.log(util.inspect(authResponse, false, null))
+
+// const identityResponse = await client.identityGet({
+//   access_token: accessToken,
+
+
+
+
+
+// console.log('---------')
+// console.log('identity response: ')
+// console.log(util.inspect(identityResponse, false, null))
+
+// const balanceResponse = await client.accountsBalanceGet({
+//   access_token: accessToken,
+// });
+// console.log('---------')
+// console.log('balamcey response: ')
+// console.log(util.inspect(balanceResponse, false, null))
+
+
+// const transactionsResponse = await client.transactionsGet(accessToken);
+// console.log('---------')
+// console.log('balamcey response: ')
+// console.log(util.inspect(transactionsResponse, false, null))
+// return res.send(transactionsResponse)
+// });
+
+// app.post('/get_access_token', async (req, res) => {
+//   //destructure publicToken in response data
+//   console.log(req)
+//   const { publicToken } = req.body
+//   const response = await client
+//     .exchangePublicToken(publicToken)
+//     .catch((err) => {
+//       if (!publicToken) {
+//         return "no public token"
+//       }
+//     });
+//   const itemId = response.item_id;
+//   return res.send({ access_token: response.access_token })
+// })
+
+// app.post('/token-exchange', async (req, res) => {
+//   const { publicToken } = req.body;
+//   const { access_token } = await client.itemPublicTokenExchange({
+//     publicToken
+//   })
+// })
+
+
+// app.post('/get_access_token', async (req, res) => {
+//   //destructure publicToken in response data
+//   const { publicToken } = req.body
+//   const response = await client
+//     .itemPublicTokenExchange(publicToken)
+//     .catch((err) => {
+//       if (!publicToken) {
+//         return "no public token"
+//       }
+//     });
+//   const itemId = response.item_id;
+//   return response.json({
+//     access_token: ACCESS_TOKEN,
+//     item_id: itemId,
+//     error: null,
+//   });
+// })
 
 // Retrieve ACH or ETF Auth data for an Item's accounts
 // https://plaid.com/docs/#auth
