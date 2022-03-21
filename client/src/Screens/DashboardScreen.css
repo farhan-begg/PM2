@@ -1,0 +1,38 @@
+.display-icome-app-container {
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: fit-content;
+  gap: 20px;
+}
+
+.flex-income-goals {
+  display: flex;
+  justify-content: space-around;
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 20px;
+}
+
+.flex-column-goals-bar {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 360px;
+  gap: 20px;
+}
+
+.flex-progress-tracker {
+  display: flex;
+  justify-content: space-between;
+}
+.dashboard-screen-main-container {
+  display: flex;
+
+  margin-top: 80px;
+
+  height: 100vh;
+}

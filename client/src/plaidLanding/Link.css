@@ -1,0 +1,82 @@
+.plaidLink-container {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  justify-content: center;
+
+  background-image: #ff0095;
+  background-image: radial-gradient(
+      at 40% 20%,
+      hsla(0, 0%, 100%, 1) 0,
+      transparent 50%
+    ),
+    radial-gradient(at 80% 0%, hsla(170, 100%, 59%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(0, 0%, 100%, 1) 0, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(199, 100%, 67%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(0, 0%, 100%, 1) 0, transparent 50%),
+    radial-gradient(at 80% 100%, rgb(248, 0, 174) 0, transparent 50%),
+    radial-gradient(at 0% 0%, hsla(0, 0%, 100%, 1) 0, transparent 50%);
+}
+
+.link-main {
+  height: 100vh;
+}
+
+img {
+  z-index: -10;
+  height: 100vh;
+  position: absolute;
+  width: 100%;
+}
+
+.link-main-title {
+  width: 800px;
+  margin-bottom: 150px;
+}
+
+.link-main-title h1 {
+  font-weight: 700;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 50px;
+  background: -webkit-linear-gradient(rgb(89, 106, 250), rgb(255, 77, 231));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.link-right-text {
+  max-width: 500px;
+  font-size: 20px;
+  color: rgb(255, 255, 255);
+  background-image: radial-gradient(
+    at 100% 20%,
+    rgba(0, 0, 0, 0.089) 0,
+    transparent 50%
+  );
+  margin-bottom: 150px;
+}
+.link-bottom-card-left {
+  padding: 20px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+
+  align-items: left;
+}
+.link-bottom-card-right {
+  padding: 20px;
+  width: 400px;
+}
+
+.link-bottom-inner-div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.link-bottom-inner-div p {
+  font-size: 1.2rem;
+  font-weight: bold;
+
+  align-items: center;
+  color: rgb(180, 180, 180);
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}

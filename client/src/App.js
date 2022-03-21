@@ -1,17 +1,18 @@
 import './App.css';
-import DisplayGains from './displayIncome/displayGains/DisplayGains';
-import DisplayGoals from './displayIncome/displayGoals/DisplayGoals';
-import DisplayIncome from './displayIncome/DisplayIncome';
-import ExpenseBar from './progressbar/ExpenseBar';
-import GoalProgressBar from './progressbar/GoalProgressBar';
-import Link from './Link';
+
+import Link from './plaidLanding/Link';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import { useState } from 'react';
 import { useEffect } from 'react';
 import axios from 'axios'
+import DashboardScreen from './Screens/DashboardScreen';
+import Navbar from './components/navbar/Navbar';
 
 
 function App() {
 
+  const [transaction, setTransactions] = useState([])
 
   const [token, setLinkToken] = useState()
   const [access_Token, setAccessToken] = useState(null)
@@ -30,14 +31,22 @@ function App() {
   console.log(token)
 
 
+  const handleOnSuccess = async (public_token, metadata) => {
+    // send token to client server
+    let data = {
+      public_token: public_token
+    }
+    let response = await axios.post("http://localhost:8000/exchange_public_token", data);
+    console.log(response)
+    console.log('svvrdddasdasda', response.data.access_token)
+    console.log(response.data.transactionsResponse)
+    setAccessToken(response.data.access_token)
+    console.log(response.data.transactionsResponse)
+    setTransactions(response.data.transactionsResponse)
+    //to do set accessToken into sessionStorage then move onto UI calls in other components.
+    sessionStorage.setItem("accessToken", response.data["access_token"]);
 
-  const getData = async () => {
-    const res = await axios.get('http://localhost:8000/exchange_public_token');
-    console.log(res)
   }
-  console.log(token)
-
-
 
 
   useEffect(() => {
@@ -74,27 +83,21 @@ function App() {
 
   return (
     <div className="App">
-      <Link token={token} access_Token={access_Token} />
-      <button onClick={getData}>get data</button>
+      <Navbar token={token} handleOnSuccess={handleOnSuccess} />
+      <Router>
+        <Routes>
+          <Route path="/signup" exact={true} element={<Link token={token} access_Token={access_Token} handleOnSuccess={handleOnSuccess} />} />
+        </Routes>
+        <Routes>
+          <Route path="/" exact={true} element={<DashboardScreen transaction={transaction} />} />
+        </Routes>
+      </Router>
+
 
       {/* // <Route path="/home" render={(routerprops) => <div accessToken={accessToken} />} /> */}
 
 
 
-      <div className="flex-income-goals">
-        <div className="display-icome-app-container">
-          <DisplayIncome />
-          <DisplayGains />
-
-        </div>
-        <div className="flex-column-goals-bar">
-          <DisplayGoals />
-          <div className="flex-progress-tracker">
-            <GoalProgressBar />
-            <ExpenseBar />
-          </div>
-        </div>
-      </div>
 
     </div>
   );
